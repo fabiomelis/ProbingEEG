@@ -64,6 +64,7 @@ print("Dimensioni matrice delle features Gallery: ", features_gallery.shape)
 features_probing, v_identity_probing, n_epochs_probing = core.compute_features_exp_off(probing_data_3d, tw, fs, selected_channels)
 print("Dimensioni matrice delle features Probing: ", features_probing.shape)
 
+
 '''
 # Calcolo FRR per ogni soggetto (?)
 
@@ -82,13 +83,27 @@ for subject in range(n_sbjs):
     print("Soggetto ", subject, " -> False Reject Rate: ",FRR)
 '''
 
+
 # Trasformazione matrice 3d delle features in matrice 2d con acquisizioni (sogg * epoche) e features
 acq_gallery = performance.reorg(features_gallery)
 acq_probing = performance.reorg(features_probing)
 
 
 EER, AUC = core.compute_EER_AUC(acq_gallery, v_identity_gallery, acq_probing, v_identity_probing)
-print("EER: ",EER, "; AUC: ",AUC)
+print("All channels -> EER: ",EER, "; AUC: ",AUC)
 
 
 
+selected_channels = [1, 4, 6, 9, 12]   # Migliori canali selezionati comparando le 18 clips
+
+features_gallery, v_identity_gallery, n_epochs_gallery = core.compute_features_exp_off(gallery_data_3d, tw, fs, selected_channels)
+
+features_probing, v_identity_probing, n_epochs_probing = core.compute_features_exp_off(probing_data_3d, tw, fs, selected_channels)
+
+
+acq_gallery = performance.reorg(features_gallery)
+acq_probing = performance.reorg(features_probing)
+
+
+EER, AUC = core.compute_EER_AUC(acq_gallery, v_identity_gallery, acq_probing, v_identity_probing)
+print("Best 5 channels -> EER: ",EER, "; AUC: ",AUC)
