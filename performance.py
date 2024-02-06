@@ -1,95 +1,92 @@
 import numpy as np
+import core
 
 
 
-def reorg(data):
+def calcolo_score_probing(gallery, probing, tw, fs, selected_channels):
 
-    r_data = np.zeros((data.shape[0] * data.shape[1], data.shape[2]))
-    k = 0
+    # probing = (3, 17, 14, 7680)
 
-    for i in range(data.shape[0]):
-        for j in range(data.shape[1]):
-            r_data[k, :] = data[i, j, :]
-            k += 1
+    n_sbjs_gallery, n_epochs_gallery, n_features_gallery = gallery.shape
+    n_sbjs_probing, n_clips, n_channels, n_samples = probing.shape
 
-    return r_data
+    #n_clips = 2
 
-
-
-def calcolo_score(ps, vettore_identita, nEp, nSogg):
-
-    nSeq = 1
-    nAcquisizioni = nEp * nSogg
-    nScore = nAcquisizioni * (nAcquisizioni - 1) // 2
-    score_distanza = np.zeros(nScore)
-    flag = np.zeros(nScore)
-
-    print(f'Processing {nAcquisizioni} acquisitions')
-
-    for ind_riga in range(1, nAcquisizioni + 1):  # scorre righe della matrice
-
-        for ind_riga2 in range(ind_riga + 1, nAcquisizioni + 1):
-
-            distanza = np.linalg.norm(ps[ind_riga - 1, :] - ps[ind_riga2 - 1, :])
-            score_distanza[nSeq - 1] = 1 / (1 + distanza)
-            if vettore_identita[ind_riga - 1] == vettore_identita[ind_riga2 - 1]:  # calcolo del FLAG
-                flag[nSeq - 1] = 1  # GENUINO
-            else:
-                flag[nSeq - 1] = 0  # IMPOSTORE
-            nSeq += 1
-
-    return score_distanza, flag
-
-
-def calcolo_score_gallery(gallery, probing):
+    n_epochs = int(np.floor(n_samples / fs / tw))
 
     n_seq = 1
-    n_acq_gallery, n_features_gallery = gallery.shape
-    n_acq_probing, n_features_probing = probing.shape
-    n_score = n_acq_probing * (n_acq_probing - 1) // 2
+
+    n_score = n_sbjs_probing * n_epochs_gallery * n_sbjs_probing * n_clips
+    print('n score: ',n_score)
     score_distanza = np.zeros(n_score)
-    flag = np.ones(n_score)
+    flag = np.zeros(n_score)
 
-    print(f'Processing {n_acq_probing} acquisitions')
 
-    for ind_riga in range(1, n_acq_gallery + 1):  # scorre righe della matrice
 
-        for ind_riga2 in range(1, n_acq_probing + 1):
+    for clip in range(n_clips):
 
-            distanza = np.linalg.norm(gallery[ind_riga - 1, :] - probing[ind_riga2 - 1, :])
-            score_distanza[n_seq - 1] = 1 / (1 + distanza)
-            n_seq += 1
+        print('Clip analizzata: ', clip +1,'\n')
+
+        features_probing, v_identity_probing, n_epochs_probing = core.compute_features_exp_off(probing[:,clip, :, :], tw, fs,
+                                                                                               selected_channels)
+        print('features_probing: ', features_probing.shape)
+        #features_probing = (3, 6, 28)
+
+        # scorre soggetti del gallery (da 1 a 3)
+        for ind_sbj_probing in range(1, n_sbjs_probing + 1):
+
+            # scorre le epoche della clip nel gallery per ogni soggetto (da 1 a 6)
+            for ind_epoch_probing in range(1, n_epochs_probing + 1):
+
+                print(f'    Trying probing sbj {ind_sbj_probing}, epoch {ind_epoch_probing}','\n')
+
+                # scorre soggetti del probing (da 1 a 3)
+                for ind_sbj_gallery in range(1, n_sbjs_gallery + 1):
+
+                    print(f'        Gallery sbj {ind_sbj_gallery}, {n_epochs_gallery} epochs')
+
+                    best_score = 0
+
+                    # scorre le epoche della clip selezionata nel probing per ogni soggetto (da 1 a 6)
+                    for ind_epoch_gallery in range(1, n_epochs_gallery + 1):
+
+
+                        distanza = np.linalg.norm(gallery[ind_sbj_gallery - 1, ind_epoch_gallery - 1, :] - features_probing[ind_sbj_probing - 1, ind_epoch_probing - 1, :])
+
+                        score = 1 / (1 + distanza)
+
+
+                        #print('score: ', score)
+
+                        if score > best_score:
+                            best_score = score
+
+                        #print('best score: ', best_score)
+
+                    print(f'        best score saved for sbj{ind_sbj_gallery}: ', best_score)
+
+                    score_distanza[n_seq - 1] = best_score
+
+                    #print('score vector: ', score_distanza)
+
+                    if ind_sbj_gallery == ind_sbj_probing:  # calcolo del FLAG
+                        flag[n_seq - 1] = 1  # GENUINO
+                        print('         Genuino\n')
+                    else:
+                        flag[n_seq - 1] = 0  # IMPOSTORE
+                        print('         Impostore\n')
+
+                    #print('flag: ', flag)
+
+                    n_seq += 1
+
+
+    print('n_seq:', n_seq)
 
     return score_distanza, flag
 
 
-def calcolo_score_probing(gallery,v_id_gallery, probing, v_id_probing):
 
-    n_seq = 1
-    n_acq_gallery, n_features_gallery = gallery.shape
-    n_acq_probing, n_features_probing = probing.shape
-
-
-    nScore = n_acq_probing * (n_acq_probing - 1) // 2
-    score_distanza = np.zeros(nScore)
-    flag = np.zeros(nScore)
-
-    print(f'Processing {n_acq_probing} acquisitions')
-
-    for ind_riga in range(1, n_acq_gallery + 1):  # scorre righe della matrice
-
-        for ind_riga2 in range(1, n_acq_probing + 1):
-
-            distanza = np.linalg.norm(gallery[ind_riga - 1, :] - probing[ind_riga2 - 1, :])
-            score_distanza[n_seq - 1] = 1 / (1 + distanza)
-
-            if v_id_gallery[ind_riga - 1] == v_id_probing[ind_riga2 - 1]:  # calcolo del FLAG
-                flag[n_seq - 1] = 1  # GENUINO
-            else:
-                flag[n_seq - 1] = 0  # IMPOSTORE
-            n_seq += 1
-
-    return score_distanza, flag
 
 
 def calcolo_FAR_FRR(score, flag):
@@ -119,28 +116,6 @@ def calcolo_FAR_FRR(score, flag):
     return FAR, FRR, vettore_soglia
 
 
-def calcolo_FRR_gallery(score, flag):
-    lunghezza_score = len(score)
-    lunghezza_flag = len(flag)
-    idx_threshold = 1
-    num_genuini = np.sum(flag)
-    num_impostori = lunghezza_flag - num_genuini
-
-    vettore_soglia = np.arange(0, 1.01, 0.01)
-    FRR = np.zeros_like(vettore_soglia)
-    FAR = np.zeros_like(vettore_soglia)
-
-    for soglia in vettore_soglia:
-        num_gen_rejected = 0  # genuini rifiutati
-        num_imp_accepted = 0  # impostori accettati
-        for ind_scoreprova in range(lunghezza_score):
-            if score[ind_scoreprova] < soglia and flag[ind_scoreprova] == 1:
-                num_gen_rejected += 1  # numero dei genuini rifiutati
-
-        FRR[idx_threshold - 1] = num_gen_rejected / num_genuini
-        idx_threshold += 1
-
-    return FRR
 
 
 def calcolo_EER_AUC(FAR, FRR):

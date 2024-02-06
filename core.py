@@ -59,9 +59,9 @@ def compute_features_exp_off(dataset, tw, fs, selected_channels):
     return ps, v_identity, n_epochs
 
 
-def compute_EER_AUC(gallery, v_id_gallery, probing, v_id_probing):
+def compute_EER_AUC(gallery, probing, tw, fs, selected_channels):
 
-    score, flag = performance.calcolo_score_probing(gallery, v_id_gallery, probing, v_id_probing)
+    score, flag = performance.calcolo_score_probing(gallery, probing, tw, fs, selected_channels)
 
     # print('Calcolo FAR e FRR')
     FAR, FRR, vettore_soglia = performance.calcolo_FAR_FRR(score, flag)
