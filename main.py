@@ -32,8 +32,8 @@ np.random.seed(1)
 
 # Scelta random di una clip per la gallery per ogni soggetto
 for subject in range(n_sbjs):
-    #gallery_clip_index = np.random.randint(0, n_clips)
-    gallery_clip_index = 0
+    gallery_clip_index = np.random.randint(0, n_clips)
+    #gallery_clip_index = 0
     #print(gallery_clip_index)
 
     # Copia dei dati della gallery

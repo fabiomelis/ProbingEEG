@@ -5,7 +5,7 @@ import core
 
 def calcolo_score_probing(gallery, probing, tw, fs, selected_channels):
 
-    # probing = (3, 17, 14, 7680)
+    # probing = (23, 17, 14, 7680)
 
     n_sbjs_gallery, n_epochs_gallery, n_features_gallery = gallery.shape
     n_sbjs_probing, n_clips, n_channels, n_samples = probing.shape
