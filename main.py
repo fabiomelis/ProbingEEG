@@ -2,6 +2,8 @@ import numpy as np
 from scipy.io import loadmat
 import core
 import performance
+import selection_alg
+import compare
 
 
 datapath = 'C:\\Users\\fabio\\Desktop\\ING INFORMATICA\\TESI\\DREAMER\\DREAMER_base\\dreamer_base.mat'
@@ -52,17 +54,21 @@ print('Dimensioni del Gallery ridotto: ', gallery_data_3d.shape)
 
 
 
-selected_channels = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+#selected_channels = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+selected_channels = [6, 1, 2, 5, 14, 8, 13, 3, 9, 11, 10, 7, 12, 4]
+#selected_channels = [6, 1, 2, 5, 13, 8]
+#selected_channels = [1, 4, 6, 9, 12]
 
 
 
-features_gallery, v_identity_gallery, n_epochs_gallery = core.compute_features_exp_off(gallery_data_3d, tw, fs, selected_channels)
-print("Dimensioni matrice delle features Gallery: ", features_gallery.shape)
 
 
+#core.compute_EER_fixed_list(selected_channels,gallery_data_3d,probing_data,tw,fs,'welch_2')
+selection_alg.forward_selection_eer(len(selected_channels),gallery_data_3d,probing_data,tw,fs,'welch_2')
+#EER, AUC = core.compute_EER_AUC(gallery_data_3d, probing_data, tw, fs, selected_channels,'welch_2')
 
-EER, AUC = core.compute_EER_AUC(features_gallery, probing_data, tw, fs, selected_channels)
 
-print("All channels -> EER: ",EER, "; AUC: ",AUC)
+#print("Best Channels [6, 1, 2, 5, 13, 8] -> EER: ",EER, "; AUC: ",AUC)
+#print("All Channels -> EER: ",EER, "; AUC: ",AUC)
 
 

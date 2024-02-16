@@ -3,11 +3,19 @@ import core
 
 
 
-def calcolo_score_probing(gallery, probing, tw, fs, selected_channels):
+def calcolo_score_probing(gallery_data_3d, probing, tw, fs, selected_channels,string):
 
     # probing = (23, 17, 14, 7680)
 
-    n_sbjs_gallery, n_epochs_gallery, n_features_gallery = gallery.shape
+    if string == 'off':
+        features_gallery, v_identity_gallery, n_epochs_gallery = core.compute_features_FOOOF(gallery_data_3d, tw, fs, selected_channels,2,string)
+
+    elif string == 'welch_2':
+        features_gallery, v_identity_gallery, n_epochs_gallery = core.compute_features_welch(gallery_data_3d, tw, fs,selected_channels,2,[(0,10),(10,20)])
+
+    print("Dimensioni matrice delle features Gallery: ", features_gallery.shape)
+
+    n_sbjs_gallery, n_epochs_gallery, n_features_gallery = features_gallery.shape
     n_sbjs_probing, n_clips, n_channels, n_samples = probing.shape
 
     #n_clips = 2
@@ -17,7 +25,7 @@ def calcolo_score_probing(gallery, probing, tw, fs, selected_channels):
     n_seq = 1
 
     n_score = n_sbjs_probing * n_epochs_gallery * n_sbjs_probing * n_clips
-    print('n score: ',n_score)
+    print('n score: ', n_score)
     score_distanza = np.zeros(n_score)
     flag = np.zeros(n_score)
 
@@ -25,33 +33,40 @@ def calcolo_score_probing(gallery, probing, tw, fs, selected_channels):
 
     for clip in range(n_clips):
 
-        print('Clip analizzata: ', clip +1,'\n')
+        print('Clip analizzata: ', clip + 1,'\n')
 
-        features_probing, v_identity_probing, n_epochs_probing = core.compute_features_exp_off(probing[:,clip, :, :], tw, fs,
-                                                                                               selected_channels)
+        if string == 'off':
+            features_probing, v_identity_probing, n_epochs_probing = core.compute_features_FOOOF(probing[:, clip, :, :], tw, fs,
+                                                                                             selected_channels, 2, string)
+        elif string == 'welch_2':
+            features_probing, v_identity_probing, n_epochs_probing = core.compute_features_welch(probing[:, clip, :, :],
+                                                                                                 tw, fs,
+                                                                                                 selected_channels, 2,
+                                                                                                 [(0,10),(10,20)])
+
         print('features_probing: ', features_probing.shape)
-        #features_probing = (3, 6, 28)
 
-        # scorre soggetti del gallery (da 1 a 3)
+
+
         for ind_sbj_probing in range(1, n_sbjs_probing + 1):
 
-            # scorre le epoche della clip nel gallery per ogni soggetto (da 1 a 6)
+
             for ind_epoch_probing in range(1, n_epochs_probing + 1):
 
                 print(f'    Trying probing sbj {ind_sbj_probing}, epoch {ind_epoch_probing}','\n')
 
-                # scorre soggetti del probing (da 1 a 3)
+
                 for ind_sbj_gallery in range(1, n_sbjs_gallery + 1):
 
                     print(f'        Gallery sbj {ind_sbj_gallery}, {n_epochs_gallery} epochs')
 
                     best_score = 0
 
-                    # scorre le epoche della clip selezionata nel probing per ogni soggetto (da 1 a 6)
+
                     for ind_epoch_gallery in range(1, n_epochs_gallery + 1):
 
 
-                        distanza = np.linalg.norm(gallery[ind_sbj_gallery - 1, ind_epoch_gallery - 1, :] - features_probing[ind_sbj_probing - 1, ind_epoch_probing - 1, :])
+                        distanza = np.linalg.norm(features_gallery[ind_sbj_gallery - 1, ind_epoch_gallery - 1, :] - features_probing[ind_sbj_probing - 1, ind_epoch_probing - 1, :])
 
                         score = 1 / (1 + distanza)
 
