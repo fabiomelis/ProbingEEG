@@ -175,4 +175,6 @@ def compute_EER_fixed_list(list_channels, gallery, probing, tw, fs, string):
 
     utils.plot_EER(EER_values)
 
+    print(EER_values)
+
     return EER_values, channel_list

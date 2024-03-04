@@ -10,8 +10,8 @@ def calcolo_score_probing(gallery_data_3d, probing, tw, fs, selected_channels,st
     if string == 'off':
         features_gallery, v_identity_gallery, n_epochs_gallery = core.compute_features_FOOOF(gallery_data_3d, tw, fs, selected_channels,2,string)
 
-    elif string == 'welch_2':
-        features_gallery, v_identity_gallery, n_epochs_gallery = core.compute_features_welch(gallery_data_3d, tw, fs,selected_channels,2,[(0,10),(10,20)])
+    elif string == 'welch_5':
+        features_gallery, v_identity_gallery, n_epochs_gallery = core.compute_features_welch(gallery_data_3d, tw, fs,selected_channels,5,[(1,3),(4,7),(8,12),(13,30),(30,50)])
 
     print("Dimensioni matrice delle features Gallery: ", features_gallery.shape)
 
@@ -38,11 +38,12 @@ def calcolo_score_probing(gallery_data_3d, probing, tw, fs, selected_channels,st
         if string == 'off':
             features_probing, v_identity_probing, n_epochs_probing = core.compute_features_FOOOF(probing[:, clip, :, :], tw, fs,
                                                                                              selected_channels, 2, string)
-        elif string == 'welch_2':
+        elif string == 'welch_5':
             features_probing, v_identity_probing, n_epochs_probing = core.compute_features_welch(probing[:, clip, :, :],
                                                                                                  tw, fs,
-                                                                                                 selected_channels, 2,
-                                                                                                 [(0,10),(10,20)])
+                                                                                                 selected_channels, 5,
+                                                                                                 [(1,3),(4,7),(8,12),(13,30),(30,50)])
+
 
         print('features_probing: ', features_probing.shape)
 

@@ -67,12 +67,13 @@ def forward_selection_eer(n_channels, gallery, probing, tw, fs, string):
     print(channel_list)
 
     utils.plot_EER(EER_values)
+    print(EER_values)
 
     return EER_values, channel_list
 
 
 
-def forward_selection_auc(n_channels, dataset, tw, fs, string):
+def forward_selection_auc(n_channels, gallery, probing, tw, fs, string):
 
     def find_best_channel_auc():
 
@@ -85,12 +86,7 @@ def forward_selection_auc(n_channels, dataset, tw, fs, string):
 
             print('Canali analizzati: ', combined_channels, )
 
-            if string == 'exp':
-                EER, AUC = core.compute_EER_AUC_exp(dataset, tw, fs, combined_channels)
-            elif string == 'off':
-                EER, AUC = core.compute_EER_AUC_exp_off(dataset, tw, fs, combined_channels)
-            elif string == 'freq':
-                EER, AUC = core.compute_EER_AUC_exp_off_freq(dataset, tw, fs, combined_channels)
+            EER, AUC = core.compute_EER_AUC(gallery, probing, tw, fs, combined_channels,string)
 
             print('EER e AUC: ', EER, AUC)
 
@@ -127,19 +123,14 @@ def forward_selection_auc(n_channels, dataset, tw, fs, string):
 
 
 
-def backward_selection_eer(n_channels, dataset, tw, fs, string):
+def backward_selection_eer(n_channels, gallery, probing, tw, fs, string):
 
     EER_values = []
     channels_history = ""
 
     selected_channels = list(range(1, n_channels + 1))
 
-    if string == 'exp':
-        EER, AUC = core.compute_EER_AUC_exp(dataset, tw, fs, selected_channels)
-    elif string == 'off':
-        EER, AUC = core.compute_EER_AUC_exp_off(dataset, tw, fs, selected_channels)
-    elif string == 'freq':
-        EER, AUC = core.compute_EER_AUC_exp_off_freq(dataset, tw, fs, selected_channels)
+    EER, AUC = core.compute_EER_AUC(gallery, probing, tw, fs, selected_channels, string)
 
     channels_str = f"{len(selected_channels)} canali: {', '.join(map(str, selected_channels))}, AUC: {EER:.4f}\n"
     channels_history += channels_str
@@ -161,12 +152,7 @@ def backward_selection_eer(n_channels, dataset, tw, fs, string):
 
             print('Canali analizzati: ', current_channels)
 
-            if string == 'exp':
-                EER, AUC = core.compute_EER_AUC_exp(dataset, tw, fs, current_channels)
-            elif string == 'off':
-                EER, AUC = core.compute_EER_AUC_exp_off(dataset, tw, fs, current_channels)
-            elif string == 'freq':
-                EER, AUC = core.compute_EER_AUC_exp_off_freq(dataset, tw, fs, current_channels)
+            EER, AUC = core.compute_EER_AUC(gallery, probing, tw, fs, current_channels, string)
 
             print('EER e AUC: ', EER, AUC)
 
@@ -193,22 +179,17 @@ def backward_selection_eer(n_channels, dataset, tw, fs, string):
 
     print(channels_history)
 
-    utils.plot_EER_backward(EER_values)
+    utils.plot_EER(EER_values)
 
 
 
-def backward_selection_auc(n_channels, dataset, tw, fs, string):
+def backward_selection_auc(n_channels, gallery, probing, tw, fs, string):
     AUC_values = []
     channels_history = ""
 
     selected_channels = list(range(1, n_channels + 1))
 
-    if string == 'exp':
-        EER, AUC = core.compute_EER_AUC_exp(dataset, tw, fs, selected_channels)
-    elif string == 'off':
-        EER, AUC = core.compute_EER_AUC_exp_off(dataset, tw, fs, selected_channels)
-    elif string == 'freq':
-        EER, AUC = core.compute_EER_AUC_exp_off_freq(dataset, tw, fs, selected_channels)
+    EER, AUC = core.compute_EER_AUC(gallery, probing, tw, fs, selected_channels, string)
 
     channels_str = f"{len(selected_channels)} canali: {', '.join(map(str, selected_channels))}, AUC: {AUC:.4f}\n"
     channels_history += channels_str
@@ -230,12 +211,7 @@ def backward_selection_auc(n_channels, dataset, tw, fs, string):
 
             print('Canali analizzati: ', current_channels)
 
-            if string == 'exp':
-                EER, AUC = core.compute_EER_AUC_exp(dataset, tw, fs, current_channels)
-            elif string == 'off':
-                EER, AUC = core.compute_EER_AUC_exp_off(dataset, tw, fs, current_channels)
-            elif string == 'freq':
-                EER, AUC = core.compute_EER_AUC_exp_off_freq(dataset, tw, fs, current_channels)
+            EER, AUC = core.compute_EER_AUC(gallery, probing, tw, fs, current_channels, string)
 
             print('EER e AUC: ', EER, AUC)
 
@@ -261,6 +237,6 @@ def backward_selection_auc(n_channels, dataset, tw, fs, string):
 
     print(channels_history)
 
-    utils.plot_AUC_backward(AUC_values)
+    utils.plot_AUC(AUC_values)
 
 

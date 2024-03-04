@@ -54,11 +54,9 @@ print('Dimensioni del Gallery ridotto: ', gallery_data_3d.shape)
 
 
 
-#selected_channels = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
-selected_channels = [6, 1, 2, 5, 14, 8, 13, 3, 9, 11, 10, 7, 12, 4]
-#selected_channels = [6, 1, 2, 5, 13, 8]
-#selected_channels = [1, 4, 6, 9, 12]
-
+selected_channels = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+#selected_channels = [6, 1, 2, 5, 14, 8, 13, 3, 9, 11, 10, 7, 12, 4]
+#selected_channels = [6, 12, 5, 8, 14, 3, 2, 11, 7, 13, 10, 1, 9, 4]
 
 
 
@@ -68,7 +66,5 @@ selection_alg.forward_selection_eer(len(selected_channels),gallery_data_3d,probi
 #EER, AUC = core.compute_EER_AUC(gallery_data_3d, probing_data, tw, fs, selected_channels,'welch_2')
 
 
-#print("Best Channels [6, 1, 2, 5, 13, 8] -> EER: ",EER, "; AUC: ",AUC)
-#print("All Channels -> EER: ",EER, "; AUC: ",AUC)
 
 
